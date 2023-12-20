@@ -1,124 +1,27 @@
 #include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <string>
-
-//동적배열
-template <typename T>
-class dynamic_array
-{
-	T* data;
-	size_t n;
-
-public:
-	dynamic_array(int n)
-	{
-		this->n = n;
-		data = new T[n];
-	}
-	dynamic_array(const dynamic_array<T>& other)
-	{
-		n = other.n;
-		data = new T[n];
-
-		for (int i = 0; i < n; i++)
-		{
-			data[i] = other[i];
-		}
-	}
-	T& operator[](int index)
-	{
-		return data[index];
-	}
-	const T& operator[](int index) const
-	{
-		return data[index];
-	}
-	T& at(int index)
-	{
-		if (index < n)
-		{
-			return data[index];
-		}
-		throw "Index out of range";
-	}
-	size_t size() const
-	{
-		return n;
-	}
-	~dynamic_array()
-	{
-		delete[] data;
-	}
-	T* begin() { return data; }
-	const T* begin() const { return data; }
-	T* end() { return data + n; }
-	const T* end() const { return data + n; }
-
-	friend dynamic_array<T> operator+(const dynamic_array <T>& arr1, const dynamic_array <T>& arr2)
-	{
-		dynamic_array<T>result(arr1.size() + arr2.size());
-		std::copy(arr1.begin(), arr1.end(), result.begin());
-		std::copy(arr2.begin(), arr2.end(), result.begin()+arr1.size());
-		return result;
-	}
-	std::string to_string(const std::string& sep = ", ")
-	{
-		if (n == 0)
-			return "";
-		std::ostringstream os;
-		os << data[0];
-		for (int i = 1; i < n; i++)
-		{
-			os << sep << data[i];
-		}
-		return os.str;
-	}
-};
-
-struct student
-{
-	std::string name;
-	int standard;
-public:
-	void getName(std::string InputName) { name = InputName; }
-	void getStandard(int InputStandard) { standard = InputStandard; }
-};
-std::ostream& operator<<(std::ostream os, const student& s)
-{
-	return (os << "[" << s.name << "," << s.standard << "]");
-}
+#include <forward_list>
+#include <vector>
 
 int main()
 {
-	int nStudents;
-	std::string tmp1 = "";
-	int tmp2 = 0;
-	std::cout << "1반 학생 수를 입력하세요:";
-	std::cin >> nStudents;
+	std::vector<std::string> vec = {
+		"Lewis Hamilton", "Lewis Hamilton"," Nico Roseberg", "Sebastian Vetel", "Lewis Hamilton", "Sebastian Vettel", "Sebastian Vettel","Sebastian Vettel","Fernando Alonso"
+	};
+	auto it = vec.begin();
+	std::cout << "vector" << std::endl;
+	std::cout << "가장 최근 우승자:" << *it << std::endl;
+	it += 8;
+	std::cout << "8년전 우승자 : " << *it << std::endl;
+	advance(it, -3);
+	std::cout << "그후 3년 뒤 우승자:" << *it << std::endl;
 
-	dynamic_array<student> class1(nStudents);
-	for (int i = 0; i < nStudents; i++)
-	{
-		std::cout << i + 1 << "번째 학생 이름과 나이를 입력하세요:";
-		student MyStudent;
-		std::cin >> MyStudent.name >> MyStudent.standard;
-		class1[i] = student{ MyStudent.name,MyStudent.standard };
-	}
-	try
-	{
-		class1.at(nStudents) = student{ "John", 8 };
+	std::cout << "forward_list" << std::endl;
+	std::forward_list <std::string> fwd(vec.begin(), vec.end());
 
-	}
-	catch (...)
-	{
-		std::cout << "예외 발생" << std::endl;
-
-	}
-	auto class2 = class1;
-	std::cout << "1반을 복사하여 2반 생성:" << class2.to_string() << std::endl;
-
-	auto class3 = class1 + class2;
-	std::cout << "1반과 2반을 합쳐 3반 생성:" << class3.to_string() << std::endl;
-	return 0;
+	auto it1 = fwd.begin();
+	std::cout << "가장 최근 우승자:" << *it1 << std::endl;
+	advance(it1, 5);
+	std::cout << "5년 전 우승자: " << *it1 << std::endl;
+	//advance(it1,-2);는 순방향으로만 이동하는 forward_list 특성상 에러
+	//it1+=2;는 반복자에 숫자를 더하지 못하므로 에러
 }
